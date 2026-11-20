@@ -1,0 +1,4 @@
+import {create} from 'zustand';import {persist} from 'zustand/middleware';
+export type CartItem={producto_id:number;nombre:string;precio_unitario:number;cantidad:number;imagen_url?:string|null};
+type CartState={items:CartItem[];add:(item:Omit<CartItem,'cantidad'>)=>void;remove:(id:number)=>void;setQuantity:(id:number,n:number)=>void;clear:()=>void;total:()=>number};
+export const useCartStore=create<CartState>()(persist((set,get)=>({items:[],add:(item)=>set(s=>({items:s.items.some(i=>i.producto_id===item.producto_id)?s.items.map(i=>i.producto_id===item.producto_id?{...i,cantidad:i.cantidad+1}:i):[...s.items,{...item,cantidad:1}]})),remove:(id)=>set(s=>({items:s.items.filter(i=>i.producto_id!==id)})),setQuantity:(id,n)=>set(s=>({items:n<1?s.items.filter(i=>i.producto_id!==id):s.items.map(i=>i.producto_id===id?{...i,cantidad:n}:i)})),clear:()=>set({items:[]}),total:()=>get().items.reduce((sum,i)=>sum+i.precio_unitario*i.cantidad,0)}),{name:'food-cart'}));
